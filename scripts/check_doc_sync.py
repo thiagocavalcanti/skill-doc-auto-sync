@@ -33,8 +33,14 @@ def get_git_changed_files():
     return files
 
 def main():
-    repo_dir = Path.cwd()
-    manifest_path = repo_dir / ".agents" / "skills" / "doc-auto-sync" / "tracked_docs.json"
+    # Try script location parent repo directory first (.agents/skills/doc-auto-sync/scripts/ -> repo_root)
+    script_based_repo = Path(__file__).resolve().parents[3]
+    manifest_path = script_based_repo / ".agents" / "skills" / "doc-auto-sync" / "tracked_docs.json"
+
+    if not manifest_path.exists():
+        # Fall back to CWD
+        repo_dir = Path.cwd()
+        manifest_path = repo_dir / ".agents" / "skills" / "doc-auto-sync" / "tracked_docs.json"
 
     if not manifest_path.exists():
         print(f"{Colors.YELLOW}⚠ Manifest file not found at {manifest_path}. Run init_doc_tracking.py first.{Colors.RESET}")
