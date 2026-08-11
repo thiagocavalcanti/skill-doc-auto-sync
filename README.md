@@ -86,6 +86,37 @@ python3 .agents/skills/doc-auto-sync/scripts/check_doc_sync.py
 
 ---
 
+## 💰 Token & Cost Savings Simulation
+
+Without `doc-auto-sync`, an AI agent checking documentation freshness before every commit must read all repository documentation files to determine if anything is outdated.
+`doc-auto-sync` replaces this brute-force reading with a zero-token local script check (`check_doc_sync.py`).
+The script evaluates staged git diffs against `tracked_docs.json` topic patterns in milliseconds.
+When a code change matches a tracked topic, the AI agent is instructed to read only the specific ~1k token topic section rather than entire documentation files.
+
+### Savings Matrix over 100 Commits
+
+The table below compares full-document inspection against `doc-auto-sync` over 100 commits (assuming ~10% of commits touch tracked code patterns, reading ~1k tokens per match).
+Estimated costs are calculated at a standard rate of **$3.00 per 1M input tokens**.
+
+| Number of Docs | Size per Doc | Total Docs Size | Unoptimized Tokens (100 Commits) | Unoptimized Cost | `doc-auto-sync` Tokens (100 Commits) | `doc-auto-sync` Cost | Savings (%) |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **1** | **1k tokens** | 1,000 tokens | 100,000 | $0.30 | 10,000 | $0.03 | **90.0%** |
+| **1** | **10k tokens** | 10,000 tokens | 1,000,000 | $3.00 | 10,000 | $0.03 | **99.0%** |
+| **1** | **100k tokens** | 100,000 tokens | 10,000,000 | $30.00 | 10,000 | $0.03 | **99.9%** |
+| **10** | **1k tokens** | 10,000 tokens | 1,000,000 | $3.00 | 10,000 | $0.03 | **99.0%** |
+| **10** | **10k tokens** | 100,000 tokens | 10,000,000 | $30.00 | 10,000 | $0.03 | **99.9%** |
+| **10** | **100k tokens** | 1,000,000 tokens | 100,000,000 | $300.00 | 10,000 | $0.03 | **99.99%** |
+| **100** | **1k tokens** | 100,000 tokens | 10,000,000 | $30.00 | 10,000 | $0.03 | **99.9%** |
+| **100** | **10k tokens** | 1,000,000 tokens | 100,000,000 | $300.00 | 10,000 | $0.03 | **99.99%** |
+| **100** | **100k tokens** | 10,000,000 tokens | 1,000,000,000 | $3,000.00 | 10,000 | $0.03 | **99.999%** |
+
+### Key Takeaways
+
+By shifting documentation diff evaluation from the LLM context window to a deterministic local script, `doc-auto-sync` eliminates redundant context loading.
+As repository size and documentation depth grow, token savings scale exponentially while maintaining 100% documentation freshness.
+
+---
+
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome!
